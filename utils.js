@@ -114,6 +114,18 @@ function sleep(ms) {
 makeModalDraggable(document.getElementById("modal-content"), 
                    document.getElementById("modal-header"));
 
+
+makeModalResizable(document.getElementById("modal-content"),
+                   document.getElementById("modal-resize"));
+
+//const modal = document.getElementById("modal-content");
+//const header = document.getElementById("modal-header");
+//const resizeHandle = document.getElementById("modal-resize");
+//
+//makeModalDraggable(modal, header);
+//makeModalResizable(modal, resizeHandle);
+
+
 function makeModalDraggable(modal, handle) {
     let startX = 0, startY = 0, initialLeft = 0, initialTop = 0;
 
@@ -173,37 +185,63 @@ function makeModalDraggable(modal, handle) {
     }
 }
 
-/*
-function makeModalDraggable(modal, handle) {
-    let offsetX = 0, offsetY = 0, startX = 0, startY = 0;
+function makeModalResizable(modal, handle) {
+    let startX = 0, startY = 0;
+    let startWidth = 0, startHeight = 0;
 
-    handle.onmousedown = dragStart;
+    // Mouse
+    handle.addEventListener("mousedown", startResizeMouse);
+    // Touch
+    handle.addEventListener("touchstart", startResizeTouch, { passive: false });
 
-    function dragStart(e) {
+    function startResizeMouse(e) {
         e.preventDefault();
-        startX = e.clientX;
-        startY = e.clientY;
-
-        document.onmousemove = dragMove;
-        document.onmouseup = dragEnd;
+        beginResize(e.clientX, e.clientY);
+        document.addEventListener("mousemove", resizeMouse);
+        document.addEventListener("mouseup", stopResizeMouse);
     }
 
-    function dragMove(e) {
+    function startResizeTouch(e) {
         e.preventDefault();
-        offsetX = e.clientX - startX;
-        offsetY = e.clientY - startY;
-
-        startX = e.clientX;
-        startY = e.clientY;
-
-        modal.style.top = (modal.offsetTop + offsetY) + "px";
-        modal.style.left = (modal.offsetLeft + offsetX) + "px";
-        modal.style.position = "absolute";
+        const t = e.touches[0];
+        beginResize(t.clientX, t.clientY);
+        document.addEventListener("touchmove", resizeTouch, { passive: false });
+        document.addEventListener("touchend", stopResizeTouch);
     }
 
-    function dragEnd() {
-        document.onmousemove = null;
-        document.onmouseup = null;
+    function beginResize(x, y) {
+        startX = x;
+        startY = y;
+        startWidth = modal.offsetWidth;
+        startHeight = modal.offsetHeight;
     }
-}
-*/
+
+    function resizeMouse(e) {
+        doResize(e.clientX, e.clientY);
+    }
+
+    function resizeTouch(e) {
+        e.preventDefault();
+        const t = e.touches[0];
+        doResize(t.clientX, t.clientY);
+    }
+
+    function doResize(x, y) {
+        const dx = x - startX;
+        const dy = y - startY;
+
+        modal.style.width = startWidth + dx + "px";
+        modal.style.height = startHeight + dy + "px";
+    }
+
+    function stopResizeMouse() {
+        document.removeEventListener("mousemove", resizeMouse);
+        document.removeEventListener("mouseup", stopResizeMouse);
+    }
+
+    function stopResizeTouch() {
+        document.removeEventListener("touchmove", resizeTouch);
+        document.removeEventListener("touchend", stopResizeTouch);
+    }
+}//makeModalResizable
+
