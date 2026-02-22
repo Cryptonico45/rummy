@@ -5,6 +5,8 @@
 
 //__ render
 function render() {
+
+
     log("render", "sys");
     
     el.cpu.innerHTML = "";
