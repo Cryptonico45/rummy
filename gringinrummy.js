@@ -1325,3 +1325,25 @@ document.getElementById("star-tr").addEventListener("click", () => {
 //function openHelpModal() {
 //    showMessage("Coming soon!");
 //}
+
+// this poisitions the center cards
+function positionCenterArea() {
+    const h = window.innerHeight;
+    const w = window.innerWidth;
+
+    const center = document.getElementById("center-area");
+
+    // Example: move left by 10% of width, down by 15% of height
+    center.style.marginLeft = -(w * 0.10) + "px";
+    center.style.marginTop  = (h * 0.15) + "px";
+
+    // for iphone or portrait mode - reset them
+    const iw = window.innerWidth;
+    if (iw <= 500) {
+    center.style.marginLeft = +(w * 0.1) + "px";
+    center.style.marginTop  = (h * 0.40) + "px";
+    }
+
+}
+
+window.addEventListener("load", positionCenterArea);

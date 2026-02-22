@@ -332,9 +332,16 @@ function computeCpuSlots() {
     const rightmostX = w - rightMargin - LEFT_SHIFT;
 
     // ⭐ Add your CPU hand shift here
-    const CPU_SHIFT_X = -60;   // negative = move left, positive = move right
-    const CPU_SHIFT_Y = -100;     // adjust if you want to move up/down
+    let CPU_SHIFT_X = -60;   // negative = move left, positive = move right
+    let CPU_SHIFT_Y = -100;     // adjust if you want to move up/down
 
+    // for iphone or portrait mode
+    const iw = window.innerWidth;
+    if (iw <= 500) {
+	CPU_SHIFT_X = -30;   // negative = move left, positive = move right
+	CPU_SHIFT_Y = -20;     // adjust if you want to move up/down
+    }
+    
     const slots = [];
 
     for (let i = 0; i < SLOTS; i++) {
@@ -466,3 +473,4 @@ function logCpuFanBounds(el) {
     */
     
 }
+

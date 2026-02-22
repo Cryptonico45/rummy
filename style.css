@@ -461,8 +461,8 @@ h1 {
     gap: 24px;
     align-items: center;
     margin: 8px 0 4px;
-    margin-left: -190px; /* move left */
-    margin-top: 90px; /* move up/down */
+/*    margin-left: -190px; 
+    margin-top: 90px; */
   }
 
 #deadwood-info {
