@@ -747,4 +747,91 @@ h1 {
   margin-left: 300px;   
 }
  */
- 
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 600px) {
+  #game {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  /* Reposisi Papan Skor ke Atas */
+  .scoreboard {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .score-block {
+    transform: scale(1);
+    min-width: 70px;
+    padding: 6px 12px;
+  }
+
+  .score-block .value {
+    font-size: 20px;
+  }
+
+  .divider {
+    font-size: 16px;
+  }
+
+  /* Atur ulang area tengah (Stock & Discard) */
+  #center-area {
+    margin-top: 10px;
+    gap: 15px;
+    transform: scale(0.9);
+  }
+
+  /* Atur ulang Deadwood info */
+  #deadwood-info {
+    margin-left: 0;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  /* Reposisi Tombol-tombol di Bawah */
+  #btn-new, #btn-newMatch, #btn-knock, #btn-gin {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    top: auto;
+    transform: translateX(-50%);
+    z-index: 10000;
+    width: 140px;
+    padding: 12px;
+  }
+
+  /* Sesuaikan Hand posisi agar tidak bertumpuk */
+  #cpu-hand {
+    height: 120px;
+  }
+
+  /* Sembunyikan Log atau perkecil di mobile */
+  #log {
+    right: 10px;
+    top: 10px;
+    transform: none;
+    width: 150px;
+    max-height: 50px;
+    z-index: 100;
+    opacity: 0.8;
+  }
+
+  #back-door {
+    right: 10px;
+    bottom: 80px; /* Di atas tombol aksi */
+    max-width: 150px;
+  }
+
+  /* CSS Variable untuk kartu yang lebih kecil di mobile */
+  :root {
+    --card-height: 120px;
+  }
+}

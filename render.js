@@ -1,250 +1,256 @@
 
-  /* ------------------------------
-     Rendering
-     ------------------------------ */
+/* ------------------------------
+   Rendering
+   ------------------------------ */
 
 //__ render
 function render() {
 
 
     log("render", "sys");
-    
+
     el.cpu.innerHTML = "";
 
     // version 3
-    const evalCpu    = evaluate(game.cpu);
+    const evalCpu = evaluate(game.cpu);
     const cpuMeldCardIds = evalCpu.melds
-	  .flat()
-	  .map(i => game.cpu[i].id);
+        .flat()
+        .map(i => game.cpu[i].id);
     const cpuMeldIds = new Set(cpuMeldCardIds);
-    
+
     const sortedCpuFinal = sortHandWithMeldsFirstv2(game.cpu, evalCpu.melds);
 
-//    console.log("after the sort");
-//    consoleLogHand(sortedCpuFinal,evalCpu.melds);
+    //    console.log("after the sort");
+    //    consoleLogHand(sortedCpuFinal,evalCpu.melds);
 
     //    console.log("evalcpu:", evalCpu)
-//    console.log("sortedCpu:",sortedCpuFinal);
+    //    console.log("sortedCpu:",sortedCpuFinal);
 
     //
-//    console.log("cpuMeldIds:",cpuMeldIds);
-//    
-//    const sortedCpuFinal = sortHandUsingMeldIds(sortedCpu, cpuMeldCardIds);
-//    console.log("sortedCpuFinal:",sortedCpuFinal);
-    
-//    renderCPU(sortedCpuFinal, evalCpu, cpuMeldIds, el);
+    //    console.log("cpuMeldIds:",cpuMeldIds);
+    //    
+    //    const sortedCpuFinal = sortHandUsingMeldIds(sortedCpu, cpuMeldCardIds);
+    //    console.log("sortedCpuFinal:",sortedCpuFinal);
+
+    //    renderCPU(sortedCpuFinal, evalCpu, cpuMeldIds, el);
     renderCPU(sortedCpuFinal, evalCpu, cpuMeldIds, el);
-    
-// v1 and v2    renderCPU(sortedCpu,evalCpu,cpuMeldIds, el);
+
+    // v1 and v2    renderCPU(sortedCpu,evalCpu,cpuMeldIds, el);
 
 
-    
-      // player cards rendering
-      
-      el.player.innerHTML = "";
+
+    // player cards rendering
+
+    el.player.innerHTML = "";
     //      const sorted = sortHandByRank(game.player);
 
 
     // new one!
 
-    const evalPlayer    = evaluate(game.player);
+    const evalPlayer = evaluate(game.player);
     const playerMeldCardIds = evalPlayer.melds
-	  .flat()
-	  .map(i => game.player[i].id);
+        .flat()
+        .map(i => game.player[i].id);
     const meldIds = new Set(playerMeldCardIds);
     const sorted = sortHandWithMeldsFirstv2(game.player, evalPlayer.melds);
- 
-    
+
+
     //   comst sorted = sortHandUsingPattern(game.player, evalPlayer.melds);
-      //    console.log("yes in render");
-      //    console.log("game draw = ", game.drawn);
-      
-//    renderPlayer(sortedCpuFinal, evalCpu, cpuMeldIds, el);
+    //    console.log("yes in render");
+    //    console.log("game draw = ", game.drawn);
+
+    //    renderPlayer(sortedCpuFinal, evalCpu, cpuMeldIds, el);
 
     // Auto-scale BEFORE positioning cards
-      autoScaleHand(el.player, sorted.length, 95, 95);
+    autoScaleHand(el.player, sorted.length, 95, 95);
 
     let gapInserted = false;
-//      gapInserted = false;
-    let i= 0;
+    //      gapInserted = false;
+    let i = 0;
     let idx = 0; // for meld group spacing
-    
-    // center the cards
-//    const effectiveSpacing = 70 * scale; // adjust for overlap
-//    const totalWidth = (sorted.length - 1) * effectiveSpacing;
-//    const offset = (window.innerWidth - totalWidth) / 2;
-//      const offset = 100; // move entire hand right
 
-    let PLAYER_SHIFT_X = -00;   // move left
+    // center the cards
+    //    const effectiveSpacing = 70 * scale; // adjust for overlap
+    //    const totalWidth = (sorted.length - 1) * effectiveSpacing;
+    //    const offset = (window.innerWidth - totalWidth) / 2;
+    //      const offset = 100; // move entire hand right
+
+    let PLAYER_SHIFT_X = 0;   // move left
     let PLAYER_SHIFT_Y = 20;      // move up/down
 
     // setup for long and thin display like iphone
     const iw = window.innerWidth;
     if (iw <= 500) {
-	PLAYER_SHIFT_X = 50; // move more to the right
-	PLAYER_SHIFT_Y = 70;      // move up/down
-    } 
+        PLAYER_SHIFT_X = 50; // move more to the right
+        PLAYER_SHIFT_Y = 70;      // move up/down
+    }
 
+    // Base Y position for player hand - adjusted for mobile
+    let playerBaseY = window.innerHeight * 0.65;
+    if (iw <= 500) {
+        playerBaseY = window.innerHeight * 0.60;
+    }
 
     // This is for meld group spacing    
     const groupIndex = new Map();
     evalPlayer.melds.forEach((group, idx) => {
-	group.forEach(i => groupIndex.set(game.player[i].id, idx));
+        group.forEach(i => groupIndex.set(game.player[i].id, idx));
     });
+
+    for (const c of sorted) {
+        const isMeld = meldIds.has(c.id);
+
+
+        // *** Fan parameters  ***
+        const total = sorted.length;
+        const center = (total - 1) / 2;
+        // Curve amount (vertical arc)
+        const curveStrength = 30;   // higher = more curve
+        // Rotation amount
+        const maxAngle = 12;        // degrees at far edges
+        // Compute relative index from center
+        // is working...	  const rel = i - center;
+        const rel = idx - center;
+        // Vertical curve (parabolic)
+        const yOffset = - (curveStrength * (1 - Math.pow(rel / center, 2)));
+        // Middle goes up, edges go down
+        // Rotation
+        const angle = (rel / center) * maxAngle;
+
+        // for scalling the spaces
+        let scale = 1;
+        if (el.player.classList.contains("normal")) scale = 1;
+        if (el.player.classList.contains("small")) scale = 0.8;
+        if (el.player.classList.contains("smaller")) scale = 0.65;
+        if (el.player.classList.contains("tiny")) scale = 0.5;
+
+        //	  const effectiveSpacing = 95 * scale;
+        const effectiveSpacing = 70 * scale;  // size of overlap
+        const totalWidth = (sorted.length - 1) * effectiveSpacing;
+        // get actual card width from CSS
+        //	  const cardWidth = parseFloat(getComputedStyle(document.documentElement) .getPropertyValue("--card-width"));
+        // corrected centering
+        //	  const offset = (window.innerWidth - totalWidth) / 2 - cardWidth / 2;
+        const offset = ((window.innerWidth - totalWidth) / 2) - 100;
+
+
+
+        // Insert gap before the first non-meld card
+        if (!isMeld && !gapInserted) {
+            const gap = document.createElement("div");
+            gap.className = "meld-gap";
+
+            // new gap
+            gap.style.position = "absolute";
+            //	      gap.style.left = `${offset + i * 75}px`;
+            gap.style.left = `${offset + i * effectiveSpacing}px`;
+
+            gap.style.top = `${playerBaseY}px`;
+            //
+
+            el.player.appendChild(gap);
+
+            i++; // gap takes a spot
+
+            gapInserted = true;
+        } // if: !isMeld && !gapInserted
+
+
+        // Insert a gap AFTER a meld group
+        const f = cardFace(c);
+        if (isMeld) f.classList.add("meld-card");
+        // REQUIRED — without this, cards do not appear
+        f.style.position = "absolute";
+
+        //    f.style.left = `${offset + i * 95}px`;
+        //	  f.style.left = `${offset + i * effectiveSpacing}px`;
+
+
+
+        f.style.left = `${offset + PLAYER_SHIFT_X + i * effectiveSpacing}px`;
+
+        //    f.style.left = `${i * 75}px`;
+        //	  f.style.top = "400px";
+        //	 f.style.top = `${400 + yOffset}px`;  // for the curve
+        f.style.top = `${playerBaseY + PLAYER_SHIFT_Y + yOffset}px`;
+
+        // Rotation
+        f.style.transform = `rotate(${angle}deg)`;
+        f.style.transformOrigin = "50% 80%";
+
+        f.onclick = () => playerDiscard(c.id);
+        //	  el.player.appendChild(f);
+
+        if (game.drawn === c.id || game.drawn?.id === c.id) {
+            f.classList.add("just-drawn");
+
+        }
+
+
+        //	  i++;
+        //	  idx++; // for gap group spacing
+
+        // open backdoor
+        f.ondblclick = () => openCloseBackDoor();
+
+        // append ONCE
+        el.player.appendChild(f);
+
+        // Insert a gap BETWEEN meld groups
+        if (isMeld) {
+            const nextCard = sorted[idx + 1];
+            if (nextCard && meldIds.has(nextCard.id)) {
+                // both are melds — check if they are different groups
+                const thisGroup = groupIndex.get(c.id);
+                const nextGroup = groupIndex.get(nextCard.id);
+
+                if (thisGroup !== nextGroup) {
+                    const gap = document.createElement("div");
+                    gap.className = "meld-gap-between";
+                    gap.style.position = "absolute";
+                    gap.style.left = `${offset + (i + 1) * effectiveSpacing}px`;
+                    gap.style.top = `${playerBaseY + PLAYER_SHIFT_Y}px`;
+                    el.player.appendChild(gap);
+
+                    i += 0.5; // actual gap size
+                }
+            }
+        }
+
+        //	  el.player.appendChild(f);
+
+
+        i++;
+        idx++; // for gap group spacing
+
+    } // for sorted - the player
+
+    renderDiscardAndDeadwood(el, game, evalPlayer);
+
+    /*
+          // ====== display deadwook count ======
+        el.deadwood.textContent = "Deadwood: " + evalPlayer.deadwood;
     
-      for (const c of sorted) {
-	  const isMeld = meldIds.has(c.id);
-
-
-	  // *** Fan parameters  ***
-	  const total = sorted.length;
-	  const center = (total - 1) / 2;
-	  // Curve amount (vertical arc)
-	  const curveStrength = 30;   // higher = more curve
-	  // Rotation amount
-	  const maxAngle = 12;        // degrees at far edges
-	  // Compute relative index from center
-// is working...	  const rel = i - center;
-	  const rel = idx - center;
-	  // Vertical curve (parabolic)
-	  const yOffset = - (curveStrength * (1 - Math.pow(rel / center, 2))); 
-	  // Middle goes up, edges go down
-	  // Rotation
-	  const angle = (rel / center) * maxAngle;
-	  
-	  // for scalling the spaces
-	  let scale = 1;
-	  if (el.player.classList.contains("normal")) scale = 1;
-	  if (el.player.classList.contains("small")) scale = 0.8;
-	  if (el.player.classList.contains("smaller")) scale = 0.65;
-	  if (el.player.classList.contains("tiny")) scale = 0.5;
-	  
-//	  const effectiveSpacing = 95 * scale;
-	  const effectiveSpacing = 70 * scale;  // size of overlap
-	  const totalWidth = (sorted.length - 1) * effectiveSpacing;
-	  // get actual card width from CSS
-//	  const cardWidth = parseFloat(getComputedStyle(document.documentElement) .getPropertyValue("--card-width"));
-	  // corrected centering
-//	  const offset = (window.innerWidth - totalWidth) / 2 - cardWidth / 2;
-	  const offset = ((window.innerWidth - totalWidth) / 2 ) - 100;
-
-
-	  
-	  // Insert gap before the first non-meld card
-	  if (!isMeld && !gapInserted) {
-              const gap = document.createElement("div");
-              gap.className = "meld-gap";
-	      
-	      // new gap
-	      gap.style.position = "absolute";
-//	      gap.style.left = `${offset + i * 75}px`;
-	      gap.style.left = `${offset + i * effectiveSpacing}px`;
-
-	      gap.style.top = "400px";
-	      //
-	
-              el.player.appendChild(gap);
-	      
-	      i++; // gap takes a spot
-	      
-              gapInserted = true;
-	  } // if: !isMeld && !gapInserted
-
-	  
-	  // Insert a gap AFTER a meld group
-	  const f = cardFace(c);
-	  if (isMeld) f.classList.add("meld-card");
-	  // REQUIRED — without this, cards do not appear
-	  f.style.position = "absolute";
-	  
-	  //    f.style.left = `${offset + i * 95}px`;
-	  //	  f.style.left = `${offset + i * effectiveSpacing}px`;
-	  	  
-
-	  f.style.left = `${offset + PLAYER_SHIFT_X + i * effectiveSpacing}px`;
-
-	  //    f.style.left = `${i * 75}px`;
-//	  f.style.top = "400px";
-//	 f.style.top = `${400 + yOffset}px`;  // for the curve
-	  f.style.top = `${400 + PLAYER_SHIFT_Y + yOffset}px`;
-
-	  // Rotation
-	  f.style.transform = `rotate(${angle}deg)`;
-	  f.style.transformOrigin = "50% 80%";
-	  
-	  f.onclick = () => playerDiscard(c.id);
-//	  el.player.appendChild(f);
-      
-	  if (game.drawn === c.id || game.drawn?.id === c.id) {
-              f.classList.add("just-drawn");
-	      
-	  }
-	  
-	  
-//	  i++;
-//	  idx++; // for gap group spacing
-	  
-	  // open backdoor
-	  f.ondblclick = () => openCloseBackDoor();
-
-	  // append ONCE
-	  el.player.appendChild(f);
-	  
-	  // Insert a gap BETWEEN meld groups
-	  if (isMeld) {
-	      const nextCard = sorted[idx+1];
-	      if (nextCard && meldIds.has(nextCard.id)) {
-		  // both are melds — check if they are different groups
-		  const thisGroup = groupIndex.get(c.id);
-		  const nextGroup = groupIndex.get(nextCard.id);
-		  
-		  if (thisGroup !== nextGroup) {
-		      const gap = document.createElement("div");
-		      gap.className = "meld-gap-between";
-		      gap.style.position = "absolute";
-		      gap.style.left = `${offset + (i + 1) * effectiveSpacing}px`;
-		      gap.style.top = `${400 + PLAYER_SHIFT_Y}px`;
-		      el.player.appendChild(gap);
-		      
-            i += 0.5; // actual gap size
-		  }
-	      }
-	  }
-	  
-//	  el.player.appendChild(f);
-
-
-	  i++;
-	  idx++; // for gap group spacing
-
-      } // for sorted - the player
-      
-   renderDiscardAndDeadwood(el, game, evalPlayer);
-   
-/*
-      // ====== display deadwook count ======
-    el.deadwood.textContent = "Deadwood: " + evalPlayer.deadwood;
-
-//    el.stockCount.textContent = "(" + game.stock.length + ")";
-
-    if (game.discard.length) {
-      const top = game.discard[game.discard.length-1];
-      const f = cardFace(top);
-      el.discard.innerHTML = "";
-	el.discard.className = "card";
-//	el.discard.className = "card discard-animate"; // ⭐ add animation class
-	el.discard.appendChild(f);
-//	  setTimeout(() => el.discard.classList.remove("discard-animate"), 200);
-    } else {
-      el.discard.className = "card back";
-      el.discard.innerHTML = "<span>EMPTY</span>";
-    }
-
-//    showMessage("update buttons in render");
-*/
+    //    el.stockCount.textContent = "(" + game.stock.length + ")";
     
-//     updateButtons();
-  } // render
+        if (game.discard.length) {
+          const top = game.discard[game.discard.length-1];
+          const f = cardFace(top);
+          el.discard.innerHTML = "";
+        el.discard.className = "card";
+    //	el.discard.className = "card discard-animate"; // ⭐ add animation class
+        el.discard.appendChild(f);
+    //	  setTimeout(() => el.discard.classList.remove("discard-animate"), 200);
+        } else {
+          el.discard.className = "card back";
+          el.discard.innerHTML = "<span>EMPTY</span>";
+        }
+    
+    //    showMessage("update buttons in render");
+    */
+
+    //     updateButtons();
+} // render
 
 function renderDiscardAndDeadwood(el, game, evalPlayer) {
     // Deadwood count
@@ -267,8 +273,8 @@ function renderDiscardAndDeadwood(el, game, evalPlayer) {
 // -- part of render
 // -- area:  866 .  Needed:  680 == normal
 function autoScaleHand(container, handLength, cardWidth, spacing) {
-// -- future    const table = document.getElementById("game"); // or your main game container
-// was...!!!    const table = document.getElementById("table"); // or your main game container
+    // -- future    const table = document.getElementById("game"); // or your main game container
+    // was...!!!    const table = document.getElementById("table"); // or your main game container
     const table = document.getElementById("game"); // or your main game container
     const areaWidth = table.clientWidth;            // <-- REAL width
 
@@ -299,10 +305,10 @@ function autoScaleHand(container, handLength, cardWidth, spacing) {
 //window.autoScaleHand = autoScaleHand;
 
 function cardBack() {
-  const div = document.createElement("div");
-  div.className = "card back";
-  div.textContent = ""; // or "CPU" or leave empty
-  return div;
+    const div = document.createElement("div");
+    div.className = "card back";
+    div.textContent = ""; // or "CPU" or leave empty
+    return div;
 }
 
 
@@ -323,12 +329,12 @@ function computeCpuSlots() {
     const SPACING = 25;          // horizontal spacing
     const ANGLE_STEP = 2.5;      // degrees per card
     const fanWidth = SLOTS * SPACING; // 250px
-    
+
     const rightMargin = w * 0.10;   // 0.05=5% from right edge
-    const topMargin   = h * 0.17;   // 0.05=5% from top
+    const topMargin = h * 0.17;   // 0.05=5% from top
 
     const LEFT_SHIFT = fanWidth * 1; // shift left by half the fan
-    
+
     const rightmostX = w - rightMargin - LEFT_SHIFT;
 
     // ⭐ Add your CPU hand shift here
@@ -338,18 +344,18 @@ function computeCpuSlots() {
     // for iphone or portrait mode
     const iw = window.innerWidth;
     if (iw <= 500) {
-	CPU_SHIFT_X = -30;   // negative = move left, positive = move right
-	CPU_SHIFT_Y = -20;     // adjust if you want to move up/down
+        CPU_SHIFT_X = -30;   // negative = move left, positive = move right
+        CPU_SHIFT_Y = -20;     // adjust if you want to move up/down
     }
-    
+
     const slots = [];
 
     for (let i = 0; i < SLOTS; i++) {
-	const angle = -((i - (SLOTS - 1) / 2) * ANGLE_STEP);
-	//	const x = rightmostX + i * SPACING;
-	const x = rightmostX + i * SPACING + CPU_SHIFT_X;
-	const top = topMargin + CPU_SHIFT_Y;
-//        slots.push({ x, angle, top: topMargin });
+        const angle = -((i - (SLOTS - 1) / 2) * ANGLE_STEP);
+        //	const x = rightmostX + i * SPACING;
+        const x = rightmostX + i * SPACING + CPU_SHIFT_X;
+        const top = topMargin + CPU_SHIFT_Y;
+        //        slots.push({ x, angle, top: topMargin });
         slots.push({ x, angle, top: top });
     }
 
@@ -371,8 +377,8 @@ function placeCpuItem(type, card, slot, container) {
             face.style.left = "0px";
             face.style.top = "0px";
 
-	    face.classList.add("cpu-card"); // new to show layoff
-	    
+            face.classList.add("cpu-card"); // new to show layoff
+
             div.appendChild(face);
         }
     }
@@ -381,7 +387,7 @@ function placeCpuItem(type, card, slot, container) {
     div.style.left = slot.x + "px";
     div.style.top = slot.top + "px";
     div.style.transformOrigin = "50% 50%";
-    
+
     div.style.transform = `rotate(${slot.angle}deg)`;
 
     container.appendChild(div);
@@ -430,7 +436,7 @@ function renderCPU(sortedCpu, evalCpu, cpuMeldIds, el) {
 
     /// for DEBUG ONLY
     ///logCpuFanBounds(el);
-    
+
 
 } //renderCPU
 
@@ -468,9 +474,9 @@ function logCpuFanBounds(el) {
     const overflow = bounds.right - window.innerWidth;
     
     if (overflow > 0) {
-	el.cpu.style.transform = `translateX(-${overflow}px)`;
+    el.cpu.style.transform = `translateX(-${overflow}px)`;
     }
     */
-    
+
 }
 
