@@ -1,134 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Gin Rummy</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    
-  </head>
-  
-  <body>
-    
-    <div id="game">
-      
-      <h1 id="title">
-	GIN RUMMY <span style="font-size: 0.5em;">(rev5 v2.1)</span>
-      </h1>
-      
-      <div id="scoreboard" class="scoreboard">
 
-	<div class="score-block cpu">
-	  <span class="label">CPU</span>
-	      <span id="score-cpu" class="value">0</span>
-	</div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2c3e50" />
+  <title>Gin Rummy</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
 
-	<div class="divider">vs</div>
+</head>
 
-	<div class="score-block you">
-	  <span class="label">You</span>
-	  <span id="score-you" class="value">0</span>
-	</div>
+<body>
 
+  <div id="game">
+
+    <h1 id="title">
+      GIN RUMMY <span style="font-size: 0.5em;">(rev5 v2.1)</span>
+    </h1>
+
+    <div id="scoreboard" class="scoreboard">
+
+      <div class="score-block cpu">
+        <span class="label">CPU</span>
+        <span id="score-cpu" class="value">0</span>
       </div>
-      
-      <div id="status-bar" hidden>
-	<div id="message" hidden>Click "New Game" to start.</div>
-      </div>
-      
-      <div id="back-door" hidden>
-	<button id="btn-backDoor-save">Save State</button>
-	<button id="btn-backDoor-restore">Restore State</button>
-	<button id="btn-backDoor-showCpuCards">Show CPU Cards</button>   
-	<button id="btn-backDoor-testMelds">Test Melds</button>   
-	<button id="btn-backDoor-showStats">Show Stats</button>   
-	<button id="btn-backDoor-pickCardDeck">Pick Card Deck</button>   
-	<button id="btn-backDoor-showLog">Show/hide Log</button>   
-	<button id="btn-backDoor-saveLogFile">Save Logfile</button>   
-      </div>
-      
-      <div id="modal" class="modal">
-	<div id="modal-content" class="modal-content">
-	  <div id="modal-header" class="modal-header">Select here to move</div>
-	  
-	  <span id="modal-text"></span>
-	  
-	  <!-- Dynamic content goes here -->
-	  <div id="modal-extra"></div> 
 
-	  <div id="modal-resize" class="resize-handle"></div>
-	  
-	  <center><button onclick="closeModal()">OK</button></center>
-	</div>
-      </div>
-      
-      <div id="center-area">
-	<div>
-	  <div id="stock" class="card back"></div>
-	  <div><span id="stock-count"></span></div>
-	</div>
-	<div>
-	  <div id="discard-top" class="card back"><span>Discard EMPTY</span></div>
-	  <div></div>
-	</div>
-      </div>
-      
-      <div id="deadwood-info">Deadwood: –</div>      
-      
-      <div id="star-tl" class="star">🥹</div>
+      <div class="divider">vs</div>
 
-<!--            <div id="star-tr" class="star">★</div> -->
-      
-      <svg id="star-tr" class="star" viewBox="0 0 24 24" aria-hidden="true" fill="gold">
-	<path d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20zm0 14.5a1.25 1.25 0 1 1 0 2.5a1.25 1.25 0 1 1 0-2.5zm1.2-4.9c-.7.5-1 .9-1 1.9h-2c0-1.7.7-2.6 1.7-3.3c.8-.6 1.3-1 1.3-1.8c0-1-.8-1.8-2-1.8c-1.3 0-2.1.9-2.1 2.2h-2c0-2.4 1.7-4.2 4.1-4.2c2.4 0 4.1 1.6 4.1 3.8c0 1.7-.9 2.6-2.1 3.2z"/>
-      </svg>
-      
-      <div id="star-bl" class="star">★</div>
-      <div id="star-br" class="star">★</div>
-      <!--	  <div id="star-midleft" class="star">★</div> -->
-      
-      <button id="btn-newMatch" >New Match</button>
-      <button id="btn-new"      >New Game</button>
-      <button id="btn-knock"    >Knock   </button>
-      <button id="btn-gin"      >Gin    </button>
-      
-      <div id="cpu-hand" class="hand"></div>
-      <div id="player-hand" class="hand"></div>
-      
-      <div id="log" hidden></div>
-      
+      <div class="score-block you">
+        <span class="label">You</span>
+        <span id="score-you" class="value">0</span>
+      </div>
+
     </div>
 
-    <input type="file" id="load-file" accept=".json" style="display:none;">
+    <div id="status-bar" hidden>
+      <div id="message" hidden>Click "New Game" to start.</div>
+    </div>
+
+    <div id="back-door" hidden>
+      <button id="btn-backDoor-save">Save State</button>
+      <button id="btn-backDoor-restore">Restore State</button>
+      <button id="btn-backDoor-showCpuCards">Show CPU Cards</button>
+      <button id="btn-backDoor-testMelds">Test Melds</button>
+      <button id="btn-backDoor-showStats">Show Stats</button>
+      <button id="btn-backDoor-pickCardDeck">Pick Card Deck</button>
+      <button id="btn-backDoor-showLog">Show/hide Log</button>
+      <button id="btn-backDoor-saveLogFile">Save Logfile</button>
+    </div>
+
+    <div id="modal" class="modal">
+      <div id="modal-content" class="modal-content">
+        <div id="modal-header" class="modal-header">Select here to move</div>
+
+        <span id="modal-text"></span>
+
+        <!-- Dynamic content goes here -->
+        <div id="modal-extra"></div>
+
+        <div id="modal-resize" class="resize-handle"></div>
+
+        <center><button onclick="closeModal()">OK</button></center>
+      </div>
+    </div>
+
+    <div id="center-area">
+      <div>
+        <div id="stock" class="card back"></div>
+        <div><span id="stock-count"></span></div>
+      </div>
+      <div>
+        <div id="discard-top" class="card back"><span>Discard EMPTY</span></div>
+        <div></div>
+      </div>
+    </div>
+
+    <div id="deadwood-info">Deadwood: –</div>
+
+    <div id="star-tl" class="star">🥹</div>
+
+    <!--            <div id="star-tr" class="star">★</div> -->
+
+    <svg id="star-tr" class="star" viewBox="0 0 24 24" aria-hidden="true" fill="gold">
+      <path
+        d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20zm0 14.5a1.25 1.25 0 1 1 0 2.5a1.25 1.25 0 1 1 0-2.5zm1.2-4.9c-.7.5-1 .9-1 1.9h-2c0-1.7.7-2.6 1.7-3.3c.8-.6 1.3-1 1.3-1.8c0-1-.8-1.8-2-1.8c-1.3 0-2.1.9-2.1 2.2h-2c0-2.4 1.7-4.2 4.1-4.2c2.4 0 4.1 1.6 4.1 3.8c0 1.7-.9 2.6-2.1 3.2z" />
+    </svg>
+
+    <div id="star-bl" class="star">★</div>
+    <div id="star-br" class="star">★</div>
+    <!--	  <div id="star-midleft" class="star">★</div> -->
+
+    <button id="btn-newMatch">New Match</button>
+    <button id="btn-new">New Game</button>
+    <button id="btn-knock">Knock </button>
+    <button id="btn-gin">Gin </button>
+
+    <div id="cpu-hand" class="hand"></div>
+    <div id="player-hand" class="hand"></div>
+
+    <div id="log" hidden></div>
+
+  </div>
+
+  <input type="file" id="load-file" accept=".json" style="display:none;">
 
 
-    <script src="help.js"></script>
-    <script src="backDoor.js"></script>
-    <script src="gameRules.js"></script>
-    <script src="patterns.js"></script>
-    <script src="preUtils.js"></script>
-    <script src="meldsTestData.js"></script>
+  <script src="help.js"></script>
+  <script src="backDoor.js"></script>
+  <script src="gameRules.js"></script>
+  <script src="patterns.js"></script>
+  <script src="preUtils.js"></script>
+  <script src="meldsTestData.js"></script>
 
-    <script src="meldsUnitTesting.js"></script>
-    <script src="melds.js"></script>
-    <script src="annimate.js"></script>
-    <script src="utils.js"></script>
-    <script src="render.js"></script>
-    <script src="gringinrummy.js"></script>
+  <script src="meldsUnitTesting.js"></script>
+  <script src="melds.js"></script>
+  <script src="annimate.js"></script>
+  <script src="utils.js"></script>
+  <script src="render.js"></script>
+  <script src="gringinrummy.js"></script>
 
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('Service Worker registered with scope:', registration.scope);
-            })
-            .catch((error) => {
-              console.error('Service Worker registration failed:', error);
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then((registration) => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch((error) => {
+            console.error('Service Worker registration failed:', error);
           });
-        });
-      }
-    </script>
+      });
+    }
+  </script>
 
-  </body>
+</body>
+
 </html>
